@@ -98,7 +98,6 @@ public class HttpRequest {
         }
 
 
-        System.out.println(contentString);
         return contentString;
     }
 }
