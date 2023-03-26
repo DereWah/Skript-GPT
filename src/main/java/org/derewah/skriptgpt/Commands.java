@@ -26,16 +26,17 @@ public class Commands implements CommandExecutor {
                     sender.sendMessage(LIGHT_PURPLE + "/skriptgpt help" + WHITE + " Show this help message.");
                     sender.sendMessage(LIGHT_PURPLE + "/skriptgpt reload" + WHITE + " Reload the config and the OpenAI key..");
                 } else if (args[0].equalsIgnoreCase("reload")) {
-                    plugin.reloadConfig();
+                    SkriptGPT.getInstance().reloadConfig();
                     sender.sendMessage(LIGHT_PURPLE + "["+DARK_PURPLE+"SkriptGPT"+LIGHT_PURPLE+"]"+GREEN+" Config reloaded.");
+                    return false;
                 } else {
                     sender.sendMessage(LIGHT_PURPLE + "["+DARK_PURPLE+"SkriptGPT"+LIGHT_PURPLE+"]"+RED+" Invalid command. /skriptgpt help");
                 }
-                return true;
+                return false;
             } else{
             sender.sendMessage(LIGHT_PURPLE + "["+DARK_PURPLE+"SkriptGPT"+LIGHT_PURPLE+"]"+RED+" You don't have the permission " + DARK_RED + "SkriptGPT.reload"+RED+".");
             }
-            return true;
+            return false;
         }
         return false;
     }

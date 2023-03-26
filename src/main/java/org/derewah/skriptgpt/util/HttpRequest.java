@@ -3,6 +3,7 @@ package org.derewah.skriptgpt.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.derewah.skriptgpt.SkriptGPT;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -45,12 +46,11 @@ public class HttpRequest {
         return mapper.writeValueAsString(mainMap);
     }
 
-    public static String main(Boolean is_chat, Boolean echo, String token, String message, Integer max_tokens, String model, Number temperature) throws Exception {
+    public static String main(Boolean is_chat, Boolean echo, String message, Integer max_tokens, String model, Number temperature) throws Exception {
         // create a URL object
 
 
         URL url = (is_chat ? new URL("https://api.openai.com/v1/chat/completions") : new URL("https://api.openai.com/v1/completions")) ;
-        System.out.println(url);
         // open a connection to the URL
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
@@ -60,7 +60,7 @@ public class HttpRequest {
         con.setRequestProperty("Accept-Charset", "UTF-8");
         con.setRequestProperty("Content-Type", "application/json");
         con.setRequestProperty("User-Agent", "Skript-GPT");
-        con.setRequestProperty("Authorization", "Bearer "+ token);
+        con.setRequestProperty("Authorization", "Bearer "+ SkriptGPT.config.getString("openai_token"));
 
         con.setDoOutput(true);
 
@@ -69,6 +69,8 @@ public class HttpRequest {
         out.write(postData.getBytes(StandardCharsets.UTF_8));
         out.flush();
         out.close();
+
+
         int responseCode = con.getResponseCode();
 
 
@@ -83,19 +85,17 @@ public class HttpRequest {
 
 
         String contentString;
-        if (responseCode == 200) {
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode rootNode = objectMapper.readTree(response.toString());
-            JsonNode contentNode;
-            if (is_chat){
-                contentNode = rootNode.path("choices").get(0).path("message").path("content");
-            } else {
-                contentNode = rootNode.path("choices").get(0).path("text"); //the response from the completion API are in a different JSON path than the Chat Completion endpoint.
-            }
-            contentString = contentNode.asText();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode rootNode = objectMapper.readTree(response.toString());
+        JsonNode contentNode;
+        if (is_chat){
+            contentNode = rootNode.path("choices").get(0).path("message").path("content");
         } else {
-            throw new Exception(String.valueOf(responseCode));
+            contentNode = rootNode.path("choices").get(0).path("text"); //the response from the completion API are in a different JSON path than the Chat Completion endpoint.
         }
+        contentString = contentNode.asText();
+
 
 
         return contentString;

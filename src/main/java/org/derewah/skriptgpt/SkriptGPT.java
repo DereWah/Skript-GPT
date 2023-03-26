@@ -14,6 +14,7 @@ public class SkriptGPT extends JavaPlugin {
 
     static SkriptGPT instance;
     SkriptAddon addon;
+
     public static FileConfiguration config;
     public void onEnable(){
         instance = this;
@@ -29,7 +30,8 @@ public class SkriptGPT extends JavaPlugin {
             saveDefaultConfig();
         }
 
-        config = getConfig();
+        reloadConfig();
+
 
         // Register Metrics
         Metrics metrics = new Metrics(this, 18068);
@@ -58,6 +60,17 @@ public class SkriptGPT extends JavaPlugin {
     public SkriptAddon getAddonInstance(){
         return addon;
     }
+
+    @Override
+    public void reloadConfig() {
+        super.reloadConfig();
+
+        saveDefaultConfig();
+        config = getConfig();
+        config.options().copyDefaults(true);
+        saveConfig();
+    }
+
 
 
 }

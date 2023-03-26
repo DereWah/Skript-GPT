@@ -81,7 +81,6 @@ public class EffCompletionRequest extends Effect {
     @Override
     @SuppressWarnings("unchecked")
     public boolean init(Expression<?>[] expr, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
-        token = SkriptGPT.config.getString("openai_token");
         prompt = (Expression<String>) expr[0];
         model = (Expression<String>) expr[1];
         max_tokens = (Expression<Number>) expr[2];
@@ -109,14 +108,9 @@ public class EffCompletionRequest extends Effect {
         Number finalI_temperature = i_temperature;
         CompletableFuture.supplyAsync(() -> {
             try {
-                return HttpRequest.main(false, echo, token ,text, i_max_tokens.intValue(), s_model, finalI_temperature);
+                return HttpRequest.main(false, echo ,text, i_max_tokens.intValue(), s_model, finalI_temperature);
             } catch (Exception ex) {
-                if (ex.getMessage().equals("401")){
-                    Skript.warning("Authentication error. Provide a valid API token in config.yml");
-                } else if (ex.getMessage().equals("429")) {
-                    Skript.warning("Request error: you might have exceeded your current quota, or you might be rate limited.");
-                }
-                throw new RuntimeException(ex);
+                return ex.getMessage();
             }
         }, threadPool)
                 .whenComplete((resp, err) -> {
