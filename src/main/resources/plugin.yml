@@ -4,3 +4,6 @@ description: A skript to interface with the OpenAI GPT API.
 version: 1.0
 main: org.derewah.skriptgpt.SkriptGPT
 depend: [Skript]
+commands:
+  skriptgpt:
+    description: The commands from SkriptGPT.

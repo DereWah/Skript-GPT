@@ -98,7 +98,7 @@ public class EffCompletionRequest extends Effect {
     @Override
     protected void execute(Event e){
         String text = prompt.getSingle(e);
-        String s_model = model != null ? model.getSingle(e) : "gpt-3.5-turbo";
+        String s_model = model != null ? model.getSingle(e) : "text-davinci-003";
         Number i_temperature = temperature != null ? temperature.getSingle(e) : 1;
         Number i_max_tokens = max_tokens != null ? max_tokens.getSingle(e) : 160;
 

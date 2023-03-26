@@ -50,7 +50,7 @@ public class HttpRequest {
 
 
         URL url = (is_chat ? new URL("https://api.openai.com/v1/chat/completions") : new URL("https://api.openai.com/v1/completions")) ;
-
+        System.out.println(url);
         // open a connection to the URL
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
 

@@ -1,7 +1,9 @@
 package org.derewah.skriptgpt;
 
+import org.bstats.bukkit.Metrics;
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAddon;
+import org.bstats.charts.SimplePie;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -22,14 +24,29 @@ public class SkriptGPT extends JavaPlugin {
             e.printStackTrace();
         }
 
+
         if (!getDataFolder().exists()) {
             saveDefaultConfig();
         }
 
         config = getConfig();
 
+        // Register Metrics
+        Metrics metrics = new Metrics(this, 18068);
+
+        metrics.addCustomChart(new SimplePie("skript_version", () ->
+                Bukkit.getServer().getPluginManager().getPlugin("Skript").getDescription().getVersion()));
+        metrics.addCustomChart(new SimplePie("skript-gpt_version", () ->
+                this.getDescription().getVersion()));
+
+
+        getCommand("skriptgpt").setExecutor(new Commands(this));
+
 
         Bukkit.getLogger().info("[SkriptGPT] has been enabled!");
+
+
+
 
     }
 
