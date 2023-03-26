@@ -44,7 +44,9 @@ After your account is created, you'll be granted 5$ in free trial credits that y
 The difference is that the ChatCompletion will always pretend to be an assistant, and will try to respond to you as in a chat. It's basically what ChatGPT is. A prompt like "Who are you" will result in "Hi! I am an helpful assistant from OpenAI...".
 
 A Completion is simply a prompt completion. It will just try to finish whatever text you feed it into. So the "Who are you" input will try to generically complete it, maybe by typing out a conversation between 2 generic people. "I'm a human being."
+
 ![Immagine 2023-03-26 105423](https://user-images.githubusercontent.com/61651096/227765440-c2904ed0-de59-4060-8e47-a8d146a72ca3.png)
+
 [OpenAI's documentation](https://platform.openai.com/docs/guides/completion)
 
 #### Do I have to pay for the API to actually use this?
