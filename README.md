@@ -51,7 +51,7 @@ A Completion is simply a prompt completion. It will just try to finish whatever 
 
 #### Do I have to pay for the API to actually use this?
 
-Well, yes. The 5 dollars free trial will last you for about a couple of months if you only use the latest model (gpt-3.5-turbo, enabled by default). This model is really fast and isn't expensive, so it's what I recommend. 
+Well, yes. The 5 dollars free trial will last you for about a couple of months if you only use the latest model (gpt-3.5-turbo, enabled by default). This model is really fast and isn't expensive, so it's what I recommend. The completion effect (not chat) might be more expensive and uses text-davinci-003 by default.
 
 You can view OpenAI's article about pricing [here](https://openai.com/pricing)
 
