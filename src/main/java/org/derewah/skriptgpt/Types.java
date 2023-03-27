@@ -10,15 +10,15 @@ import org.derewah.skriptgpt.types.ConversationMessage;
 public class Types {
 
     static {
-        Classes.registerClass(new ClassInfo<>(ConversationMessage.class, "conversation message")
+        Classes.registerClass(new ClassInfo<>(ConversationMessage.class, "conversationmessage")
+                        .user("conversation message")
                 .defaultExpression(new EventValueExpression<>(ConversationMessage.class))
-                .user("conversation message")
-                .name("Conversation Message")
+                .name("conversation message")
                 .description("Represents one message of a conversation. Holds a role and a content value.")
                 .parser(new Parser<ConversationMessage>(){
 
                     @Override
-                    public ConversationMessage parse(String id, ParseContext arg1){
+                    public ConversationMessage parse(final String id, ParseContext arg1){
                         ConversationMessage newmess = new ConversationMessage();
                         newmess.role = "user";
                         newmess.content = id;
@@ -27,19 +27,14 @@ public class Types {
 
                     @Override
                     public String toString(ConversationMessage conv, int arg1){
-                        return conv.toString();
+                        return conv.content;
                     }
-
 
                     @Override
                     public String toVariableNameString(ConversationMessage conv){
                         return conv.toString();
                     }
 
-                    @Override
-                    public String getVariableNamePattern(){
-                        return "r";
-                    }
 
 
                 })

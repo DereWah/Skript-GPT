@@ -19,21 +19,28 @@ import java.util.Map;
 public class HttpRequest {
 
 
-    public static String mapToJson(Boolean is_chat, Boolean echo, String message, Integer max_tokens, String model, Number temperature) throws JsonProcessingException {
+    public static String mapToJson(Boolean is_chat, Boolean echo, String message, Integer max_tokens, String model, Number temperature, Boolean conversation) throws JsonProcessingException {
         // create the messages list
 
 
         Map<String, Object> mainMap = new HashMap<>();
         mainMap.put("max_tokens", max_tokens);
         mainMap.put("model", model);
+        mainMap.put("temperature", temperature);
 
         if (is_chat) {
-            List<Map<String, String>> messages = new ArrayList<>();
-            Map<String, String> userMessage = new HashMap<>();
-            userMessage.put("role", "user");
-            userMessage.put("content", message);
-            messages.add(userMessage);
-            mainMap.put("messages", messages);
+            if (!conversation) {
+                List<Map<String, String>> messages = new ArrayList<>();
+                Map<String, String> userMessage = new HashMap<>();
+                userMessage.put("role", "user");
+                userMessage.put("content", message);
+                messages.add(userMessage);
+                mainMap.put("messages", messages);
+            }else{
+                mainMap.put("messages", message);
+            }
+
+
         } else {
             mainMap.put("prompt", message);
             if (echo){mainMap.put("echo", echo);}
@@ -46,7 +53,7 @@ public class HttpRequest {
         return mapper.writeValueAsString(mainMap);
     }
 
-    public static String main(Boolean is_chat, Boolean echo, String message, Integer max_tokens, String model, Number temperature) throws Exception {
+    public static String main(Boolean is_chat, Boolean echo, Boolean conversation,  String message, Integer max_tokens, String model, Number temperature) throws Exception {
         // create a URL object
 
 
@@ -64,7 +71,9 @@ public class HttpRequest {
 
         con.setDoOutput(true);
 
-        String postData = mapToJson(is_chat, echo, message, max_tokens, model, temperature);
+
+
+        String postData = mapToJson(is_chat, echo, message, max_tokens, model, temperature, conversation);
         DataOutputStream out = new DataOutputStream(con.getOutputStream());
         out.write(postData.getBytes(StandardCharsets.UTF_8));
         out.flush();

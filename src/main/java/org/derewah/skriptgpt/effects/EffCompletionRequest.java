@@ -108,7 +108,7 @@ public class EffCompletionRequest extends Effect {
         Number finalI_temperature = i_temperature;
         CompletableFuture.supplyAsync(() -> {
             try {
-                return HttpRequest.main(false, echo ,text, i_max_tokens.intValue(), s_model, finalI_temperature);
+                return HttpRequest.main(false, echo ,false, text, i_max_tokens.intValue(), s_model, finalI_temperature);
             } catch (Exception ex) {
                 return ex.getMessage();
             }
@@ -117,12 +117,12 @@ public class EffCompletionRequest extends Effect {
 
                     if (err != null) {
                         err.printStackTrace();
-                        ExprGeneratedText.content = null;
+                        ExprGeneratedText.conv.content = null;
                         return;
                     }
 
                     Bukkit.getScheduler().runTask(SkriptGPT.getInstance(), () -> {
-                        ExprGeneratedText.content = resp;
+                        ExprGeneratedText.conv.content = resp;
                         if (getNext() != null){
                             TriggerItem.walk(getNext(), e);
                         }
