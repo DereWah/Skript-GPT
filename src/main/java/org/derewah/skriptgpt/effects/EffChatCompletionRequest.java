@@ -15,6 +15,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.derewah.skriptgpt.SkriptGPT;
 import org.derewah.skriptgpt.expressions.ExprGeneratedText;
+import org.derewah.skriptgpt.types.ConversationMessage;
 import org.derewah.skriptgpt.util.HttpRequest;
 
 import java.lang.reflect.Field;
@@ -45,15 +46,18 @@ public class EffChatCompletionRequest extends Effect {
 
     static  {
         registerEffect(EffChatCompletionRequest.class,
-                "(generate|make) [a] chat[gpt] completion with (prompt|input) %string% [and model %-string%] [and max tokens %-number%] [and temperature %-number%]"
+                "(generate|make) [a] chat[gpt] completion with (prompt|input) %string% [and model %-string%] [and max tokens %-number%] [and temperature %-number%]",
+                "(generate|make) [a] chat[gpt] completion with conversation %conversationmessages% [and model %-string%] [and max tokens %-number%] [and temperature %-number%]"
         );
     }
 
     private Expression<String> prompt;
+
+    private Expression<ConversationMessage> prompts;
     private Expression<String> model;
     private Expression<Number> temperature;
     private Expression<Number> max_tokens;
-    private String token;
+
 
     private static final Field DELAYED;
 
@@ -78,11 +82,14 @@ public class EffChatCompletionRequest extends Effect {
     @Override
     @SuppressWarnings("unchecked")
     public boolean init(Expression<?>[] expr, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
-        prompt = (Expression<String>) expr[0];
+        if (matchedPattern == 0) {
+            prompt = (Expression<String>) expr[0];
+        }else{
+            prompts = (Expression<ConversationMessage>) expr[0];
+        }
         model = (Expression<String>) expr[1];
         max_tokens = (Expression<Number>) expr[2];
         temperature = (Expression<Number>) expr[3];
-
         return true;
     }
 
@@ -93,7 +100,16 @@ public class EffChatCompletionRequest extends Effect {
 
     @Override
     protected void execute(Event e){
-        String text = prompt.getSingle(e);
+        ConversationMessage[] convs;
+        if (prompt != null){
+            convs = new ConversationMessage[]{};
+            ConversationMessage conv = new ConversationMessage();
+            conv.role = "user";
+            conv.content = prompt.getSingle(e);
+            convs[0] = conv;
+        }else{
+            convs = prompts.getArray(e);
+        }
         String s_model = model != null ? model.getSingle(e) : "gpt-3.5-turbo";
         Number i_temperature = temperature != null ? temperature.getSingle(e) : 1;
         Number i_max_tokens = max_tokens != null ? max_tokens.getSingle(e) : 160;
@@ -104,9 +120,8 @@ public class EffChatCompletionRequest extends Effect {
         Number finalI_temperature = i_temperature;
         CompletableFuture.supplyAsync(() -> {
             try {
-                return HttpRequest.main(true, false, text, i_max_tokens.intValue(), s_model, finalI_temperature);
+                return HttpRequest.main(true, false, convs, i_max_tokens.intValue(), s_model, finalI_temperature);
             } catch (Exception ex) {
-                System.out.println(ex);
                 if (ex.getMessage().equals("401")){
                     Skript.warning("Authentication error. Provide a valid API token in config.yml");
                 } else if (ex.getMessage().equals("429")) {
@@ -119,12 +134,12 @@ public class EffChatCompletionRequest extends Effect {
 
                     if (err != null) {
                         err.printStackTrace();
-                        ExprGeneratedText.content = null;
+                        ExprGeneratedText.conv.content = null;
                         return;
                     }
 
                     Bukkit.getScheduler().runTask(SkriptGPT.getInstance(), () -> {
-                        ExprGeneratedText.content = resp;
+                        ExprGeneratedText.conv.content = resp;
                         if (getNext() != null){
                             TriggerItem.walk(getNext(), e);
                         }
@@ -154,7 +169,7 @@ public class EffChatCompletionRequest extends Effect {
 
 
     public String toString(Event e, boolean debug) {
-        return "generate chatgpt completion with prompt " + prompt.toString(e, debug)
+        return "generate chatgpt completion with prompt " + (prompt!= null ? prompt.toString(e, debug):prompts.getSingle(e))
                 + (model != null ? " and model " + model.toString(e, debug) : "")
                 + (max_tokens != null ? " and max tokens " + max_tokens.toString(e, debug) : "")
                 + (temperature != null ? " and temperature " + temperature.toString(e, debug) : "");

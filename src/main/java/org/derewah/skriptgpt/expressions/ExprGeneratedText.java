@@ -7,24 +7,28 @@ import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.util.Kleenean;
 import org.bukkit.event.Event;
+import org.derewah.skriptgpt.types.ConversationMessage;
 
 
-public class ExprGeneratedText extends SimpleExpression<String> {
+public class ExprGeneratedText extends SimpleExpression<ConversationMessage> {
 
     static {
-        Skript.registerExpression(ExprGeneratedText.class, String.class, ExpressionType.SIMPLE, "[the] [last] generated prompt");
+        Skript.registerExpression(ExprGeneratedText.class, ConversationMessage.class, ExpressionType.SIMPLE, "[the] [last] generated prompt");
     }
 
-    public static String content;
+    public static ConversationMessage conv = new ConversationMessage();
+
 
     @Override
-    public boolean init(Expression<?>[] expr, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResut) {
+    public boolean init(Expression<?>[] expr, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
         return true;
     }
 
     @Override
-    protected String[] get(Event e){
-        return new String[] { content };
+    protected ConversationMessage[] get(Event e){
+        conv.role = "assistant"; //this is always used to retrieve a response, it is always assistant.
+        //conv.content is already set from the response of the http request.
+        return new ConversationMessage[] { conv };
     }
 
     @Override
@@ -33,12 +37,13 @@ public class ExprGeneratedText extends SimpleExpression<String> {
         return true;
     }
 
-    public Class<? extends String> getReturnType(){
-        return String.class;
+    @Override
+    public Class<? extends ConversationMessage> getReturnType(){
+        return ConversationMessage.class;
     }
 
     public String toString(Event e, boolean debug){
-        return "Received generated text";
+        return "Last received generated text, as a conversation message.";
     }
 
 }
