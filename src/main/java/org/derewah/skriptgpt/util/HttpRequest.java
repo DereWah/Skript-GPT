@@ -57,7 +57,6 @@ public class HttpRequest {
         ObjectMapper mapper = new ObjectMapper();
 
 
-        System.out.println(mapper.writeValueAsString(mainMap));
         return mapper.writeValueAsString(mainMap);
     }
 

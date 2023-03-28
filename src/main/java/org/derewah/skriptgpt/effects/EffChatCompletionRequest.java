@@ -47,13 +47,13 @@ public class EffChatCompletionRequest extends Effect {
     static  {
         registerEffect(EffChatCompletionRequest.class,
                 "(generate|make) [a] chat[gpt] completion with (prompt|input) %string% [and model %-string%] [and max tokens %-number%] [and temperature %-number%]",
-                "(generate|make) [a] chat[gpt] completion with conversation %conversation messages% [and model %-string%] [and max tokens %-number%] [and temperature %-number%]"
+                "(generate|make) [a] chat[gpt] completion with conversation %conversationmessages% [and model %-string%] [and max tokens %-number%] [and temperature %-number%]"
         );
     }
 
     private Expression<String> prompt;
 
-    private Expression<ConversationMessage[]> prompts;
+    private Expression<ConversationMessage> prompts;
     private Expression<String> model;
     private Expression<Number> temperature;
     private Expression<Number> max_tokens;
@@ -85,7 +85,7 @@ public class EffChatCompletionRequest extends Effect {
         if (matchedPattern == 0) {
             prompt = (Expression<String>) expr[0];
         }else{
-            prompts = (Expression<ConversationMessage[]>) expr[0];
+            prompts = (Expression<ConversationMessage>) expr[0];
         }
         model = (Expression<String>) expr[1];
         max_tokens = (Expression<Number>) expr[2];
@@ -108,7 +108,7 @@ public class EffChatCompletionRequest extends Effect {
             conv.content = prompt.getSingle(e);
             convs[0] = conv;
         }else{
-            convs = prompts.getSingle(e);
+            convs = prompts.getArray(e);
         }
         String s_model = model != null ? model.getSingle(e) : "gpt-3.5-turbo";
         Number i_temperature = temperature != null ? temperature.getSingle(e) : 1;
@@ -169,7 +169,7 @@ public class EffChatCompletionRequest extends Effect {
 
 
     public String toString(Event e, boolean debug) {
-        return "generate chatgpt completion with prompt " + prompt.toString(e, debug)
+        return "generate chatgpt completion with prompt " + (prompt!= null ? prompt.toString(e, debug):prompts.getSingle(e))
                 + (model != null ? " and model " + model.toString(e, debug) : "")
                 + (max_tokens != null ? " and max tokens " + max_tokens.toString(e, debug) : "")
                 + (temperature != null ? " and temperature " + temperature.toString(e, debug) : "");

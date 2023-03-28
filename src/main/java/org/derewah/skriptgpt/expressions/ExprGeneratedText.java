@@ -16,7 +16,7 @@ public class ExprGeneratedText extends SimpleExpression<ConversationMessage> {
         Skript.registerExpression(ExprGeneratedText.class, ConversationMessage.class, ExpressionType.SIMPLE, "[the] [last] generated prompt");
     }
 
-    public static ConversationMessage conv;
+    public static ConversationMessage conv = new ConversationMessage();
 
 
     @Override
