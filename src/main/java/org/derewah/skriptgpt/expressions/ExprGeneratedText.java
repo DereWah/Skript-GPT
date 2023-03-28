@@ -13,7 +13,7 @@ import org.derewah.skriptgpt.types.ConversationMessage;
 public class ExprGeneratedText extends SimpleExpression<ConversationMessage> {
 
     static {
-        Skript.registerExpression(ExprGeneratedText.class, ConversationMessage.class, ExpressionType.SIMPLE, "[the] [last] generated prompt");
+        Skript.registerExpression(ExprGeneratedText.class, ConversationMessage.class, ExpressionType.SIMPLE, "[the] [last] [gpt] generated prompt");
     }
 
     public static ConversationMessage conv = new ConversationMessage();
@@ -21,6 +21,7 @@ public class ExprGeneratedText extends SimpleExpression<ConversationMessage> {
 
     @Override
     public boolean init(Expression<?>[] expr, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
+
         return true;
     }
 
@@ -32,7 +33,6 @@ public class ExprGeneratedText extends SimpleExpression<ConversationMessage> {
     }
 
     @Override
-
     public boolean isSingle(){
         return true;
     }

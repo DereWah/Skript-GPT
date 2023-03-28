@@ -35,7 +35,21 @@ import static ch.njol.skript.Skript.registerEffect;
         "\t\tgenerate a chatgpt completion with prompt \"Give me the name of an epic sword. In your response only include the name, and color it with minecraft colors. Do not include anything else. JUST THE NAME. JUST THE NAME IN THE RESPONSE. Example: &dAncient &5Sword or &eSword of &cFire\"",
         "\t\tset {_name} to generated prompt",
         "\t\treplace all \"%nl%%nl%\" in {_name} with \"\" #ChatGPT sometime add a double newline at the beginning of the completion.",
-        "\t\tadd 1 diamond sword named {_name} to player's inventory"
+        "\t\tadd 1 diamond sword named {_name} to player's inventory",
+        "--------------------------",
+        "command /completion [<text>]:\n" +
+                "\ttrigger:\n" +
+                "\t\tif arg is set:\n" +
+                "\t\t\tsend message \"&7DereWah:&f %arg%\"\n" +
+                "\t\t\tset {_c} to arg parsed as conversation message\n" +
+                "\t\t\tadd {_c} to {gpt::%player%::*}\n" +
+                "\t\t\tgenerate a chat completion with conversation {gpt::%player%::*}\n" +
+                "\t\t\tset {_p} to last generated prompt\n" +
+                "\t\t\tadd {_p} to {gpt::%player%::*}\n" +
+                "\t\t\tsend \"&7ChatGPT:&f %{_p}%\"\n" +
+                "\t\telse:\n" +
+                "\t\t\tsend message \"&cYou cleared your previous conversation.\"\n" +
+                "\t\t\tclear {gpt::%player%::*}"
 })
 
 @Since("1.0")
