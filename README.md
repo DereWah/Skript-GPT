@@ -17,6 +17,8 @@ command /swordgpt:
 		add 1 diamond sword named {_name} to player's inventory
 ```
 
+[![SkriptHubViewTheDocs](http://skripthub.net/static/addon/ViewTheDocsButton.png)](http://skripthub.net/docs/?addon=Skript-GPT)
+
 
 ## Setup
 
