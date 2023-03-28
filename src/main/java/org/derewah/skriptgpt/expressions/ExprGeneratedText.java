@@ -18,14 +18,16 @@ public class ExprGeneratedText extends SimpleExpression<ConversationMessage> {
 
     public static ConversationMessage conv;
 
+
     @Override
-    public boolean init(Expression<?>[] expr, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResut) {
+    public boolean init(Expression<?>[] expr, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
         return true;
     }
 
     @Override
     protected ConversationMessage[] get(Event e){
-        conv.role = "assistant"; //this is always used to retrieve a response, it always is assistant.
+        conv.role = "assistant"; //this is always used to retrieve a response, it is always assistant.
+        //conv.content is already set from the response of the http request.
         return new ConversationMessage[] { conv };
     }
 

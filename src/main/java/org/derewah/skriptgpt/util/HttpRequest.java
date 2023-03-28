@@ -3,11 +3,14 @@ package org.derewah.skriptgpt.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.derewah.skriptgpt.SkriptGPT;
+import org.derewah.skriptgpt.types.ConversationMessage;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -19,7 +22,7 @@ import java.util.Map;
 public class HttpRequest {
 
 
-    public static String mapToJson(Boolean is_chat, Boolean echo, String message, Integer max_tokens, String model, Number temperature, Boolean conversation) throws JsonProcessingException {
+    public static String mapToJson(Boolean is_chat, Boolean echo, Object message, Integer max_tokens, String model, Number temperature) throws JsonProcessingException {
         // create the messages list
 
 
@@ -28,32 +31,37 @@ public class HttpRequest {
         mainMap.put("model", model);
         mainMap.put("temperature", temperature);
 
-        if (is_chat) {
-            if (!conversation) {
-                List<Map<String, String>> messages = new ArrayList<>();
-                Map<String, String> userMessage = new HashMap<>();
-                userMessage.put("role", "user");
-                userMessage.put("content", message);
-                messages.add(userMessage);
-                mainMap.put("messages", messages);
-            }else{
-                mainMap.put("messages", message);
+        if (is_chat && message instanceof String) {
+            List<Map<String, String>> messages = new ArrayList<>();
+            Map<String, String> userMessage = new HashMap<>();
+            userMessage.put("role", "user");
+            userMessage.put("content", (String) message);
+            messages.add(userMessage);
+            mainMap.put("messages", messages);
+        }
+        else if(is_chat && message instanceof ConversationMessage[]){
+            ObjectMapper objectMapper = new ObjectMapper();
+            ArrayList convs = new ArrayList<Map<String, String>>();
+            for (ConversationMessage conv : (ConversationMessage[]) message){
+                Map<String, String> mess = new HashMap<>();
+                mess.put("role", conv.role);
+                mess.put("content", conv.content);
+                convs.add(mess);
             }
-
-
+            mainMap.put("messages", convs);
         } else {
             mainMap.put("prompt", message);
             if (echo){mainMap.put("echo", echo);}
         }
 
-
-
         ObjectMapper mapper = new ObjectMapper();
 
+
+        System.out.println(mapper.writeValueAsString(mainMap));
         return mapper.writeValueAsString(mainMap);
     }
 
-    public static String main(Boolean is_chat, Boolean echo, Boolean conversation,  String message, Integer max_tokens, String model, Number temperature) throws Exception {
+    public static String main(Boolean is_chat, Boolean echo, Object message, Integer max_tokens, String model, Number temperature) throws Exception {
         // create a URL object
 
 
@@ -71,9 +79,7 @@ public class HttpRequest {
 
         con.setDoOutput(true);
 
-
-
-        String postData = mapToJson(is_chat, echo, message, max_tokens, model, temperature, conversation);
+        String postData = mapToJson(is_chat, echo, message, max_tokens, model, temperature);
         DataOutputStream out = new DataOutputStream(con.getOutputStream());
         out.write(postData.getBytes(StandardCharsets.UTF_8));
         out.flush();

@@ -15,6 +15,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.derewah.skriptgpt.SkriptGPT;
 import org.derewah.skriptgpt.expressions.ExprGeneratedText;
+import org.derewah.skriptgpt.types.ConversationMessage;
 import org.derewah.skriptgpt.util.HttpRequest;
 
 import java.lang.reflect.Field;
@@ -108,7 +109,7 @@ public class EffCompletionRequest extends Effect {
         Number finalI_temperature = i_temperature;
         CompletableFuture.supplyAsync(() -> {
             try {
-                return HttpRequest.main(false, echo ,false, text, i_max_tokens.intValue(), s_model, finalI_temperature);
+                return HttpRequest.main(false, echo , text, i_max_tokens.intValue(), s_model, finalI_temperature);
             } catch (Exception ex) {
                 return ex.getMessage();
             }
