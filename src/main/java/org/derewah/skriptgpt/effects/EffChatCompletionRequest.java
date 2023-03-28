@@ -61,7 +61,7 @@ public class EffChatCompletionRequest extends Effect {
     static  {
         registerEffect(EffChatCompletionRequest.class,
                 "(generate|make) [a] chat[gpt] completion with (prompt|input) %string% [and model %-string%] [and max tokens %-number%] [and temperature %-number%]",
-                "(generate|make) [a] chat[gpt] completion with conversation %conversationmessages% [and model %-string%] [and max tokens %-number%] [and temperature %-number%]"
+                "(generate|make) [a] chat[gpt] completion with conversation %conversationmessages%t [and model %-string%] [and max tokens %-number%] [and temperature %-number%]"
         );
     }
 

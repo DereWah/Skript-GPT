@@ -17,13 +17,20 @@ public class Types {
                 .description("Represents one message of a conversation. Holds a role and a content value.")
                 .parser(new Parser<ConversationMessage>(){
 
+//                    @Override
+//                    public ConversationMessage parse(final String id, ParseContext arg1){
+//                        ConversationMessage newmess = new ConversationMessage();
+//                        newmess.role = "user";
+//                        newmess.content = id;
+//                        return newmess;
+//                    }
+
+
                     @Override
-                    public ConversationMessage parse(final String id, ParseContext arg1){
-                        ConversationMessage newmess = new ConversationMessage();
-                        newmess.role = "user";
-                        newmess.content = id;
-                        return newmess;
+                    public boolean canParse(ParseContext parseContext){
+                        return false;
                     }
+
 
                     @Override
                     public String toString(ConversationMessage conv, int arg1){

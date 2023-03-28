@@ -1,7 +1,7 @@
 name: Skript-GPT
 author: DereWah
 description: A skript to interface with the OpenAI GPT API.
-version: 1.0
+version: 1.1
 main: org.derewah.skriptgpt.SkriptGPT
 depend: [Skript]
 commands:
