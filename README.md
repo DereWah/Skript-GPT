@@ -43,6 +43,7 @@ Generate a response to a prompt string using the OpenAI ChatGPT API, based on an
 
 <details>
 	<summary>GPT Completion WITHOUT Conversation Persistence</summary>
+
 	```
 	command /chat <text>:
 	trigger:
@@ -54,6 +55,7 @@ Generate a response to a prompt string using the OpenAI ChatGPT API, based on an
 </details>
 
 ### GPT Completion Request
+
 ```
 (generate|make) [a] [gpt] completion with (prompt|input) %string% [and model %-string%] [and max tokens %-number%] [and temperature %-number%]
 (generate|make) [a] [gpt] completion with (prompt|input) %string% [and model %-string%] [and max tokens %-number%] [and temperature %-number%] without echo
@@ -64,6 +66,7 @@ ATTENTION! This syntax does not use the ChatGPT endpoint. You won't receive back
 
 <details>
 	<summary>GPT Completion Request</summary>
+
 	```
 		command /completion <text>:
 	trigger:
@@ -96,6 +99,7 @@ generate chat completion with conversation %conversationmessages% #Use conversat
 
 <details>
 	<summary>Set bias of conversation</summary>
+
 		```
 		command /setbias <text>:
 	trigger:
@@ -112,6 +116,7 @@ generate chat completion with conversation %conversationmessages% #Use conversat
 
 <details>
 	<summary>Show previous conversation</summary>
+
 		```
 		command /showconv:
 	trigger:
@@ -135,6 +140,7 @@ Returns the last generated response from a Chat Completion request. Call this im
 
 <details>
 	<summary>Last Generated Prompt from Chat Completion Request</summary>
+
 		```
 		command /chat <text>:
 	trigger:
@@ -153,6 +159,7 @@ Returns a conversation message type with a role and an empty content. if the [wi
 
 <details>
 	<summary>Create New Conversation Message</summary>
+
 		```
 		command /chatcompletion [<text>]:
 	trigger:
@@ -181,6 +188,7 @@ Returns a string, which indicates the sender of the message. The role can only b
 
 <details>
 	<summary>Set Role of Conversation Message</summary>
+
 		```
 		set {_msg} to new conversation message #defaults role to "user"
 		set gpt role of {_msg} to "system"
@@ -197,6 +205,7 @@ Returns the content of a conversation message.
 
 <details>
 	<summary>See another player's conversation</summary>
+
 	```
 	command /inspectconv <offlineplayer>:
 	trigger:
