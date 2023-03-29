@@ -53,7 +53,7 @@ Generate a response to a prompt string using the OpenAI ChatGPT API, based on an
 	```
 </details>
 
-###GPT Completion Request
+### GPT Completion Request
 ```
 (generate|make) [a] [gpt] completion with (prompt|input) %string% [and model %-string%] [and max tokens %-number%] [and temperature %-number%]
 (generate|make) [a] [gpt] completion with (prompt|input) %string% [and model %-string%] [and max tokens %-number%] [and temperature %-number%] without echo
