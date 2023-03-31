@@ -5,24 +5,19 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
-import ch.njol.skript.effects.Delay;
-import ch.njol.skript.lang.Effect;
+
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
-import ch.njol.skript.lang.TriggerItem;
+
+import ch.njol.skript.util.AsyncEffect;
 import ch.njol.util.Kleenean;
-import org.bukkit.Bukkit;
+
 import org.bukkit.event.Event;
-import org.derewah.skriptgpt.SkriptGPT;
+
 import org.derewah.skriptgpt.expressions.ExprGeneratedText;
 import org.derewah.skriptgpt.types.ConversationMessage;
 import org.derewah.skriptgpt.util.HttpRequest;
 
-import java.lang.reflect.Field;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static ch.njol.skript.Skript.registerEffect;
 
@@ -56,12 +51,12 @@ import static ch.njol.skript.Skript.registerEffect;
 
 
 
-public class EffChatCompletionRequest extends Effect {
+public class EffChatCompletionRequest extends AsyncEffect {
 
     static  {
         registerEffect(EffChatCompletionRequest.class,
                 "(generate|make) [a] chat[gpt] completion with (prompt|input) %string% [and model %-string%] [and max tokens %-number%] [and temperature %-number%]",
-                "(generate|make) [a] chat[gpt] completion with conversation %conversationmessages%t [and model %-string%] [and max tokens %-number%] [and temperature %-number%]"
+                "(generate|make) [a] chat[gpt] completion with conversation %conversationmessages% [and model %-string%] [and max tokens %-number%] [and temperature %-number%]"
         );
     }
 
@@ -73,29 +68,10 @@ public class EffChatCompletionRequest extends Effect {
     private Expression<Number> max_tokens;
 
 
-    private static final Field DELAYED;
-
-    static {
-        Field _DELAYED = null;
-        try {
-            _DELAYED = Delay.class.getDeclaredField("delayed");
-            _DELAYED.setAccessible(true);
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-            Skript.warning("Skript's 'delayed' method could not be resolved. Some Skript warnings may " +
-                    "not be available.");
-        }
-        DELAYED = _DELAYED;
-    }
-
-
-
-
-
-
     @Override
     @SuppressWarnings("unchecked")
     public boolean init(Expression<?>[] expr, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
+        getParser().setHasDelayBefore(Kleenean.TRUE);
         if (matchedPattern == 0) {
             prompt = (Expression<String>) expr[0];
         }else{
@@ -107,16 +83,11 @@ public class EffChatCompletionRequest extends Effect {
         return true;
     }
 
-
-
-    private static final ExecutorService threadPool =
-            Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-
     @Override
     protected void execute(Event e){
         ConversationMessage[] convs;
         if (prompt != null){
-            convs = new ConversationMessage[]{};
+            convs = new ConversationMessage[1];
             ConversationMessage conv = new ConversationMessage();
             conv.role = "user";
             conv.content = prompt.getSingle(e);
@@ -132,9 +103,9 @@ public class EffChatCompletionRequest extends Effect {
         }
 
         Number finalI_temperature = i_temperature;
-        CompletableFuture.supplyAsync(() -> {
+
             try {
-                return HttpRequest.main(true, false, convs, i_max_tokens.intValue(), s_model, finalI_temperature);
+                ExprGeneratedText.conv.content =  HttpRequest.main(true, false, convs, i_max_tokens.intValue(), s_model, finalI_temperature);
             } catch (Exception ex) {
                 if (ex.getMessage().equals("401")){
                     Skript.warning("Authentication error. Provide a valid API token in config.yml");
@@ -143,43 +114,8 @@ public class EffChatCompletionRequest extends Effect {
                 }
                 throw new RuntimeException(ex);
             }
-        }, threadPool)
-                .whenComplete((resp, err) -> {
-
-                    if (err != null) {
-                        err.printStackTrace();
-                        ExprGeneratedText.conv.content = null;
-                        return;
-                    }
-
-                    Bukkit.getScheduler().runTask(SkriptGPT.getInstance(), () -> {
-                        ExprGeneratedText.conv.content = resp;
-                        if (getNext() != null){
-                            TriggerItem.walk(getNext(), e);
-                        }
-                    });
-                });
     }
 
-
-    @Override
-    protected TriggerItem walk(Event e) {
-        debug(e, true);
-        delay(e);
-        execute(e);
-        return null;
-    }
-
-
-    @SuppressWarnings("unchecked")
-    private void delay(Event e) {
-        if (DELAYED != null) {
-            try {
-                ((Set<Event>) DELAYED.get(null)).add(e);
-            } catch (IllegalAccessException ignored) {
-            }
-        }
-    }
 
 
     public String toString(Event e, boolean debug) {

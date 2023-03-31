@@ -5,24 +5,19 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
-import ch.njol.skript.effects.Delay;
+
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
-import ch.njol.skript.lang.TriggerItem;
+
 import ch.njol.util.Kleenean;
-import org.bukkit.Bukkit;
+
 import org.bukkit.event.Event;
-import org.derewah.skriptgpt.SkriptGPT;
+
 import org.derewah.skriptgpt.expressions.ExprGeneratedText;
-import org.derewah.skriptgpt.types.ConversationMessage;
+
 import org.derewah.skriptgpt.util.HttpRequest;
 
-import java.lang.reflect.Field;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static ch.njol.skript.Skript.registerEffect;
 
@@ -55,24 +50,8 @@ public class EffCompletionRequest extends Effect {
     private Expression<String> model;
     private Expression<Number> temperature;
     private Expression<Number> max_tokens;
-    private String token;
 
     private Boolean echo;
-
-    private static final Field DELAYED;
-
-    static {
-        Field _DELAYED = null;
-        try {
-            _DELAYED = Delay.class.getDeclaredField("delayed");
-            _DELAYED.setAccessible(true);
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-            Skript.warning("Skript's 'delayed' method could not be resolved. Some Skript warnings may " +
-                    "not be available.");
-        }
-        DELAYED = _DELAYED;
-    }
 
 
 
@@ -91,10 +70,6 @@ public class EffCompletionRequest extends Effect {
     }
 
 
-
-    private static final ExecutorService threadPool =
-            Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-
     @Override
     protected void execute(Event e){
         String text = prompt.getSingle(e);
@@ -107,49 +82,21 @@ public class EffCompletionRequest extends Effect {
         }
 
         Number finalI_temperature = i_temperature;
-        CompletableFuture.supplyAsync(() -> {
             try {
-                return HttpRequest.main(false, echo , text, i_max_tokens.intValue(), s_model, finalI_temperature);
+                ExprGeneratedText.conv.content =  HttpRequest.main(false, echo , text, i_max_tokens.intValue(), s_model, finalI_temperature);
             } catch (Exception ex) {
-                return ex.getMessage();
+                if (ex.getMessage().equals("401")){
+                    Skript.warning("Authentication error. Provide a valid API token in config.yml");
+                } else if (ex.getMessage().equals("429")) {
+                    Skript.warning("Request error: you might have exceeded your current quota, or you might be rate limited.");
+                }
+                throw new RuntimeException(ex);
             }
-        }, threadPool)
-                .whenComplete((resp, err) -> {
-
-                    if (err != null) {
-                        err.printStackTrace();
-                        ExprGeneratedText.conv.content = null;
-                        return;
-                    }
-
-                    Bukkit.getScheduler().runTask(SkriptGPT.getInstance(), () -> {
-                        ExprGeneratedText.conv.content = resp;
-                        if (getNext() != null){
-                            TriggerItem.walk(getNext(), e);
-                        }
-                    });
-                });
     }
 
 
-    @Override
-    protected TriggerItem walk(Event e) {
-        debug(e, true);
-        delay(e);
-        execute(e);
-        return null;
-    }
 
 
-    @SuppressWarnings("unchecked")
-    private void delay(Event e) {
-        if (DELAYED != null) {
-            try {
-                ((Set<Event>) DELAYED.get(null)).add(e);
-            } catch (IllegalAccessException ignored) {
-            }
-        }
-    }
 
 
     public String toString(Event e, boolean debug) {

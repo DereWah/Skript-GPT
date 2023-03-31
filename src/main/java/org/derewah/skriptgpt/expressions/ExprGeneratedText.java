@@ -27,9 +27,12 @@ public class ExprGeneratedText extends SimpleExpression<ConversationMessage> {
 
     @Override
     protected ConversationMessage[] get(Event e){
-        conv.role = "assistant"; //this is always used to retrieve a response, it is always assistant.
+        ConversationMessage new_conv = new ConversationMessage();
+        new_conv.role = "assistant";
+        new_conv.content = conv.content;
+        //this is always used to retrieve a response, it is always assistant.
         //conv.content is already set from the response of the http request.
-        return new ConversationMessage[] { conv };
+        return new ConversationMessage[] { new_conv };
     }
 
     @Override
