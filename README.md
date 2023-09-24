@@ -1,5 +1,5 @@
 
-# Skript-GPT
+# Skript-GPT ![Downloads](https://img.shields.io/github/downloads/DereWah/Skript-GPT/total)
 
 A Skript Addon that allows users to interface with the OpenAI API and lets them send completion requests.
 
