@@ -22,7 +22,7 @@ import java.util.Map;
 public class HttpRequest {
 
 
-    public static String mapToJson(Boolean is_chat, Boolean echo, Object message, Integer max_tokens, String model, Number temperature) throws JsonProcessingException {
+    public static String mapToJson(Boolean is_chat, Boolean echo, Object message, Integer max_tokens, String model, Number temperature, Boolean json_format) throws JsonProcessingException {
         // create the messages list
 
 
@@ -30,6 +30,11 @@ public class HttpRequest {
         mainMap.put("max_tokens", max_tokens);
         mainMap.put("model", model);
         mainMap.put("temperature", temperature);
+
+
+        if(json_format){
+            mainMap.put("response_format", "{'type': 'json_object'}");
+        }
 
         if (is_chat && message instanceof String) {
             List<Map<String, String>> messages = new ArrayList<>();
@@ -60,7 +65,7 @@ public class HttpRequest {
         return mapper.writeValueAsString(mainMap);
     }
 
-    public static String main(Boolean is_chat, Boolean echo, Object message, Integer max_tokens, String model, Number temperature) throws Exception {
+    public static String main(Boolean is_chat, Boolean echo, Object message, Integer max_tokens, String model, Number temperature, Boolean json_format) throws Exception {
         // create a URL object
 
 
@@ -78,7 +83,7 @@ public class HttpRequest {
 
         con.setDoOutput(true);
 
-        String postData = mapToJson(is_chat, echo, message, max_tokens, model, temperature);
+        String postData = mapToJson(is_chat, echo, message, max_tokens, model, temperature, json_format);
         DataOutputStream out = new DataOutputStream(con.getOutputStream());
         out.write(postData.getBytes(StandardCharsets.UTF_8));
         out.flush();
@@ -109,8 +114,6 @@ public class HttpRequest {
             contentNode = rootNode.path("choices").get(0).path("text"); //the response from the completion API are in a different JSON path than the Chat Completion endpoint.
         }
         contentString = contentNode.asText();
-
-
 
         return contentString;
     }

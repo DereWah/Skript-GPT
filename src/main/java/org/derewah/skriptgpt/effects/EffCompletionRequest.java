@@ -83,7 +83,7 @@ public class EffCompletionRequest extends Effect {
 
         Number finalI_temperature = i_temperature;
             try {
-                ExprGeneratedText.conv.content =  HttpRequest.main(false, echo , text, i_max_tokens.intValue(), s_model, finalI_temperature);
+                ExprGeneratedText.conv.content =  HttpRequest.main(false, echo , text, i_max_tokens.intValue(), s_model, finalI_temperature, false);
             } catch (Exception ex) {
                 if (ex.getMessage().equals("401")){
                     Skript.warning("Authentication error. Provide a valid API token in config.yml");

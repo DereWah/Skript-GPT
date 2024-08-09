@@ -56,7 +56,9 @@ public class EffChatCompletionRequest extends AsyncEffect {
     static  {
         registerEffect(EffChatCompletionRequest.class,
                 "(generate|make) [a] chat[gpt] completion with (prompt|input) %string% [and model %-string%] [and max tokens %-number%] [and temperature %-number%]",
-                "(generate|make) [a] chat[gpt] completion with conversation %conversationmessages% [and model %-string%] [and max tokens %-number%] [and temperature %-number%]"
+                "(generate|make) [a] chat[gpt] completion with (prompt|input) %string% [and model %-string%] [and max tokens %-number%] [and temperature %-number%] with json format",
+                "(generate|make) [a] chat[gpt] completion with conversation %conversationmessages% [and model %-string%] [and max tokens %-number%] [and temperature %-number%]",
+                "(generate|make) [a] chat[gpt] completion with conversation %conversationmessages% [and model %-string%] [and max tokens %-number%] [and temperature %-number%] with json format"
         );
     }
 
@@ -66,16 +68,22 @@ public class EffChatCompletionRequest extends AsyncEffect {
     private Expression<String> model;
     private Expression<Number> temperature;
     private Expression<Number> max_tokens;
+    private Boolean json_format;
 
 
     @Override
     @SuppressWarnings("unchecked")
     public boolean init(Expression<?>[] expr, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
+        json_format = false;
         getParser().setHasDelayBefore(Kleenean.TRUE);
-        if (matchedPattern == 0) {
+        if (matchedPattern <= 1) {
             prompt = (Expression<String>) expr[0];
         }else{
             prompts = (Expression<ConversationMessage>) expr[0];
+        }
+
+        if(matchedPattern+1 % 2 == 0){
+            json_format = true;
         }
         model = (Expression<String>) expr[1];
         max_tokens = (Expression<Number>) expr[2];
@@ -105,7 +113,7 @@ public class EffChatCompletionRequest extends AsyncEffect {
         Number finalI_temperature = i_temperature;
 
             try {
-                ExprGeneratedText.conv.content =  HttpRequest.main(true, false, convs, i_max_tokens.intValue(), s_model, finalI_temperature);
+                ExprGeneratedText.conv.content =  HttpRequest.main(true, false, convs, i_max_tokens.intValue(), s_model, finalI_temperature, json_format);
             } catch (Exception ex) {
                 if (ex.getMessage().equals("401")){
                     Skript.warning("Authentication error. Provide a valid API token in config.yml");
